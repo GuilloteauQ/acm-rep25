@@ -20,6 +20,7 @@
             rubber
             (rWrapper.override { packages = [ rPackages.tidyverse ]; })
             graphviz
+		    (aspellWithDicts (d: [d.en]))
           ];
         };
       };
