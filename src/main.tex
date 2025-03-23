@@ -205,12 +205,12 @@
 
 The entire scientific community has been struck by the ``Reproducibility Crisis''~\cite{baker500ScientistsLift2016}, and Computer Science does not make exception~\cite{collberg_repeatability_2015}.
 In order to improve the reproducibility of articles in Computer Science, the community set up \adae\ processes~\cite{kidwell2016badges} where authors would submit (if they want) the artifact required to reproduced the main results from their article.
-Then a set of artifact reviewers would try to reproduce those main results given the artifact from the authors.
+Then, artifact reviewers would try to reproduce those main results given the artifact from the authors.
 Based on the result of the reproduction attempt, the article is then awarded \emph{badges} to promote its reproducibility aspect.
-The link to the artifacts can be found in the published version of the article, sometimes with an appendix giving more information about the artifact (\eg\ download instructions, hardware requirements, experiments workflow) \cite{paperswithcode, kang2023papers, hong2013software}.
+The link to the artifacts can be found in the published version of the article, sometimes with an appendix giving more information about the artifact (\eg\ download instructions, hardware requirements, workflow)~\cite{paperswithcode, kang2023papers, hong2013software}.
 
 One difficult aspect of creating a truly reproducible artifact is to properly control the software environment: packages and libraries versions.
-Several works already shed light on the possible varability of results given a badly captured software environment \cite{mytkowicz_producing_nodate} \todo{more}.
+Several works already shed light on the possible varability of results given a badly captured software environment \cite{mytkowicz_producing_nodate}.
 To tackle this issue, the conference \ae\ committees have been pushing the authors to provide containers or virtual machines to share their artifacts in order to ``freeze'' their software environment.
 However, authors generate their artifact right before the artifact submission~\cite{guilloteau2024longevity, guilloteau2024frustrations}.
 Moreover, in the case of usual virtualisation techiniques to generate containers or virtual machines, users have to write the recipe made of a list of commands to execute from a base image.
@@ -226,13 +226,13 @@ Moreover, storing the built binary image exhibits limitations when needed to \em
 Having the opportunity to extend previous scientific work is a crucial aspect in any scientific field.
 
 
-\todo{this is already some kind of conlusion...}
-A better solution would be to use tools such as Nix~\cite{dolstra_nix_2004} or Guix~\cite{courtes_functional_2013} which are focused on reproducibility and which are able to rebuild the \emph{exact same} software environment from a textual description and with longevity properties~\cite{courtes2024source}, but these tools are unfortunately poorly adopted by the community~\cite{guilloteau2024longevity}.
+%\todo{this is already some kind of conlusion...}
+%A better solution would be to use tools such as Nix~\cite{dolstra_nix_2004} or Guix~\cite{courtes_functional_2013} which are focused on reproducibility and which are able to rebuild the \emph{exact same} software environment from a textual description and with longevity properties~\cite{courtes2024source}, but these tools are unfortunately poorly adopted by the community~\cite{guilloteau2024longevity}.
 
 
 In this paper, we propose our \textbf{inital design of a longitudinal study of the variations through time of the software environment produced by \df s from research artifacts.}
 We show initial results from five \df s extracted from the EuroPar'24 conference reproducibility artifacts built every month for six months.
-\todo{The goal is not to dunk on authors or conferences, but simply to exhibit the potential issues with \df s.}
+% \todo{The goal is not to dunk on authors or conferences, but simply to exhibit the potential issues with \df s.}
 
 % We aim to answer the following questions:
 % 
@@ -266,10 +266,11 @@ In this section, we present \ecg, a tool for the periodic building of \df s from
 
 An \df\ from an artifact is represented as a Nickel~\cite{nickel} file.
 Nickel is a configuration language with functional paradigm.
-One of it's feature is the possibility go ``verify'' that an configuration is ``well-formed'' with a \emph{contract}.
+One of it's feature is the possibility to ``verify'' that an configuration is ``well-formed'' with a \emph{contract}.
 This Nickel file is then \emph{verified} against the contract (\todo{link to contract}) and translated to a JSON file fed to \ecg.
+The contract is versionned to take into account the potential future changes to the descriptions and the contract.
 
-\begin{lstlisting}[caption=Example of Artifact representation in the Nickel format.]
+\begin{lstlisting}[caption=Example of Artifact Nickel representation]
 {
   version = "1.0",
   artifact_url = "https://zenodo.org/.../artifact.zip",
@@ -292,7 +293,7 @@ This Nickel file is then \emph{verified} against the contract (\todo{link to con
 \end{lstlisting}
 
 
-\subsection{What do we capture?}\label{sec:ecg:capture}
+\subsection{Information captured by \ecg}\label{sec:ecg:capture}
 
 \subsubsection{Hash of the Artifact}
 
@@ -348,11 +349,9 @@ Hence, \ecg\ will download \emph{localy} the source code pointed by the URL and 
   \label{fig:workflow}
 \end{figure*}
 
-The workflow of ecg is depicted in Figure~\ref{fig:workflow}, and is executed on machines of the \grid\ platform \cite{grid5000} on the \texttt{dahu} cluster of the Grenoble site.
-Theses machines are x86 machines.
+The workflow of \ecg\ is depicted in Figure~\ref{fig:workflow}.
 We make sure to use an empty local Docker cache before building the containers.
-
-The workflow itself is ruled by a Snakemake~\cite{koster2012snakemake} description, where the software environment is managed with Nix~\cite{dolstra_nix_2004}.
+The workflow itself is ruled by a Snakemake~\cite{koster2012snakemake} description and its software environment is managed with Nix~\cite{dolstra_nix_2004}.
 
 \subsection{Contributions}
 
@@ -419,7 +418,27 @@ All the artifacts managed to successfully produce a container.
 
 \subsection{Software Environment}
 
-\todo{check which base image, tag of base image and if apt-get update}
+\begin{table}
+  \centering
+  \scalebox{0.925}{
+  \begin{tabular}{llll}
+    \toprule
+    Artifact & Base image & Version & \texttt{update}?\\
+    \midrule
+    \texttt{canon\_solving} & \texttt{ubuntu} & \texttt{22.04} & Yes \\
+    \texttt{geijer\_how}    & \texttt{ubuntu} & \texttt{22.04} & Yes \\
+    \texttt{hiraga\_peanuts}& \texttt{devcontainers/cpp} & \texttt{1-debian-12} & Yes \\
+    \texttt{munoz\_fault}   & \texttt{ubuntu} & \texttt{22.04} & Yes \\
+    \texttt{wolff\_fast}    & \texttt{ubuntu} & \texttt{22.04} & Yes \\
+    \bottomrule
+  \end{tabular}
+  }
+  \caption{Information about the \df s from the study}\label{tab:info}
+\end{table}
+
+Table~\ref{tab:info} summarizes the information about the studied \df s.
+We can see that most of the container used the \texttt{ubuntu} base image and that \emph{all} the \df s specified the version of the base image to use, thus limiting the variations in terms of produced software environment.
+However, all of the \df s called the \texttt{apt-get update} command, which fetches every time the latest versions of the packages and thus does introduces variations.
 
 \begin{figure*}
   \centering
@@ -447,7 +466,7 @@ We can see that every month, new versions of packages are being introduced in th
   \centering
   \includegraphics[width=0.5\textwidth]{./figs/results_per_tool.pdf}
   \caption{
-    plop
+    Evolution through time of the packages in the software environments managed by each tool present in the studied artifacts.
   }\label{fig:results_per_tool}
 \end{figure}
 
@@ -517,18 +536,27 @@ This paper presented the initial design of our longitudinal study of the evoluti
 We presented in Section~\ref{sec:ecg} \ecg, and its workflow (Section~\ref{sec:workflow}), a tool to download, build and extract information from research artifacts \df.
 Section~\ref{sec:protocol} presented the protocol to answer our scientific questions.
 We showed initial results in Section~\ref{sec:results} on five artifacts from the EuroPar'24 conference built every months for six months.
-This initial study releaved that the software environments produced by the considered \df s variate \emph{every month} which highlights the lack of reproducibility of such practices.
+
+While this initial study only considered five \df s, it releaved that \textbf{the software environments produced by the considered \df s variate \emph{every month}} which highlights the lack of reproducibility of such practices.
+The question of the significance of these results on such a small sample will need to be answered in a larger scale study.
 
 A practice to deal with the lack of reproducibility of the \df s is for the authors to store the built container onto some long-time storage such as Zenodo.
 However, this practice raises serious questions in terms of scalability and sustainability in terms of storage.
 The lack of reproducibility of \df s shoud not be hidden with long-term storage: the practices from the conferences, journals, and the authors need to change.
+
+\paragraph{Perspectives}
+
+This paper aimed to be an initial version of the design of a future larger study around the longevity of containers.
+We will consider not only Docker containers, but also other containerization tools such as Apptainer.
+We will thus write the descriptions of more artifacts from more conferences, aiming for around a hundreds total containers, from conferences of various fields of Science with various Computer Science technical levels.
+
 
 %
 % /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 \section*{Acknowledgments}
 
-Antoine?
+%Antoine?
 
 Experiments presented in this paper were carried out using the Grid'5000 testbed, supported by a scientific interest group hosted by Inria and including CNRS, RENATER and several Universities as well as other organizations (see https://www.grid5000.fr). 
 
