@@ -260,14 +260,14 @@ Finally, we conclude and give perspectives in Section~\ref{sec:conclusion}.
 %% \end{itemize}                   
 
 In this section, we present \ecg, a tool for the periodic building of \df s from research artifacts and the collection of software environment information.
-\ecg\ is a 280-line Python3 script under the GPLv3 license.
+\ecg\ is a 280-line Python3 script~\cite{ecg} under the GPLv3 license.
 
 \subsection{Artifact representation}\label{sec:nickel}
 
 An \df\ from an artifact is represented as a Nickel~\cite{nickel} file.
 Nickel is a configuration language with functional paradigm.
 One of it's feature is the possibility to ``verify'' that an configuration is ``well-formed'' with a \emph{contract}.
-This Nickel file is then \emph{verified} against the contract (\todo{link to contract}) and translated to a JSON file fed to \ecg.
+This Nickel file is then \emph{verified} against the contract~\cite{ecg_contract} and translated to a JSON file fed to \ecg.
 The contract is versioned to take into account the potential future changes to the descriptions and the contract.
 
 \begin{lstlisting}[caption=Example of Artifact Nickel representation]
@@ -403,6 +403,7 @@ We wrote the description in Nickel (see Section~\ref{sec:nickel}) for the five a
 The initial build was October 1$^{st}$ 2024, then the following builds were on November 4$^{th}$ 2024, December 2$^{nd}$ 2024, January 2$^{nd}$ 2025, February 5$^{th}$ 2025, and March 12$^{th}$ 2025.
 The deadline to submit the artifacts was May 15$^{th}$ 2024\footnote{\url{https://2024.euro-par.org/calls/artifacts/}}.
 %\todo{when was the artifact submission, and publicaiton of the papers for europar?}
+The data collected is available on Zenodo~\cite{dataset_europar24}.
 
 The following sections follow the dimensions captured by \ecg\ (see Section~\ref{sec:ecg:capture}).
 

@@ -10,10 +10,10 @@ DATES:=20241001 20241104 20241201 20250102 20250205 20250312
 DATA_PKGS:= $(foreach wrd,$(ARTIFACTS),$(foreach date,$(DATES), data/europar24/pkgs/$(wrd)/$(date).csv))
 DATA_BUILD_STATUS:= $(foreach wrd,$(ARTIFACTS),$(foreach date,$(DATES), data/europar24/build_status/$(wrd)/$(date).csv))
 DATA_ARTIFACT_HASH:= $(foreach wrd,$(ARTIFACTS),$(foreach date,$(DATES), data/europar24/artifact_hash/$(wrd)/$(date).csv))
-# DATA_PKGS := $(foreach wrd,$(ARTIFACTS),$(shell ls -1 data/europar24/pkgs/$(wrd)/ | xargs -I{} echo data/europar24/pkgs/$(wrd)/{}))
-# DATA_BUILD_STATUS := $(foreach wrd,$(ARTIFACTS),$(shell ls -1 data/europar24/build_status/$(wrd)/ | xargs -I{} echo data/europar24/build_status/$(wrd)/{}))
-# DATA_ARTIFACT_HASH := $(foreach wrd,$(ARTIFACTS),$(shell ls -1 data/europar24/artifact_hash/$(wrd)/ | xargs -I{} echo data/europar24/artifact_hash/$(wrd)/{}))
 
+.PHONY:
+clean_data:
+	rm -rf data/
 
 data/europar24.zip:
 	mkdir -p data/ && wget $(ZENODO_URL) -O $@
@@ -21,7 +21,7 @@ data/europar24.zip:
 data/europar24: data/europar24.zip
 	unzip -d data/ $^ 
 
-$(DATA_PKGS) $(DATA_BUILD_STATUS) $(DATA_ARTIFACT_HASH): data/europar24
+$(DATA_PKGS) $(DATA_BUILD_STATUS) $(DATA_ARTIFACT_HASH): data/europar24/
 	true
 
 src/main.pdf: src/main.tex src/references.bib $(FIGS)
