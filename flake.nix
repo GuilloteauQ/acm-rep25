@@ -11,7 +11,6 @@
       pkgs = import nixpkgs { inherit system; };
     in
     {
-
       devShells.${system} = {
         default = pkgs.mkShell {
           packages = with pkgs; [
@@ -20,6 +19,7 @@
             rubber
             (rWrapper.override { packages = [ rPackages.tidyverse ]; })
             graphviz
+			wget
 		    (aspellWithDicts (d: [d.en]))
           ];
         };
