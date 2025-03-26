@@ -18,11 +18,11 @@ clean_data:
 data/europar24.zip:
 	mkdir -p data/ && wget $(ZENODO_URL) -O $@
 
-data/europar24/: data/europar24.zip
-	unzip -d data/ $^ 
+data/.ok: data/europar24.zip
+	unzip -d data/ $^ && touch $@
 
-$(DATA_PKGS) $(DATA_BUILD_STATUS) $(DATA_ARTIFACT_HASH): data/europar24/
-	true
+$(DATA_PKGS) $(DATA_BUILD_STATUS) $(DATA_ARTIFACT_HASH): data/.ok
+	true 
 
 src/main.pdf: src/main.tex src/references.bib $(FIGS)
 	cd src && rubber -d main
