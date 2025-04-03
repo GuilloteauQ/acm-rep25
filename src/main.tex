@@ -110,7 +110,7 @@
 
 \title{%
   % (Very) Preliminary Study of the Longevity of Docker Images from Research Artifacts
-  Longitudinal Study of the Software Environments Produced by Dockerfiles from Research Artifacts: Initial Design% and Results
+  Longitudinal Study of Software Environments Produced by Dockerfiles from Research Artifacts: Initial Design% and Results
 }
 
 % \author{Quentin Guilloteau}
@@ -122,15 +122,15 @@
 
 \author{Quentin Guilloteau}
 \orcid{0009-0003-7645-5044}
-\email{Quentin.Guilloteau@unibas.ch}
+\email{Quentin.Guilloteau@inria.fr}
 \affiliation{%
-  \institution{University of Basel}
-  \city{Basel}
-  \country{Switzerland}
+  \institution{Inria, CNRS, ENSL, UCBL1, LIP}
+  \city{Lyon}
+  \country{France}
 }
 
 \author{Antoine Waehren}
-\email{Antoine.Waehren@stud.unibas.ch}
+\email{A.Waehren@stud.unibas.ch}
 \affiliation{%
   \institution{University of Basel}
   \city{Basel}
@@ -198,7 +198,7 @@
 %%
 %% Keywords. The author(s) should pick words that accurately describe
 %% the work being presented. Separate the keywords with commas.
-\keywords{Reproducibility, Artifact Evaluation, Badges, Lifetime}
+\keywords{Artifact Evaluation, Containers, Longevity, Sustainability}
 
 \received{12 February 2024}
 \received[revised]{12 March 2009}
@@ -230,24 +230,23 @@
 % \end{itemize}
 
 The entire scientific community has been struck by the ``Reproducibility Crisis''~\cite{baker500ScientistsLift2016}, and Computer Science does not make exception~\cite{collberg_repeatability_2015}.
-In order to improve the reproducibility of articles in Computer Science, the community set up \adae\ processes~\cite{kidwell2016badges} where authors would submit (if they want) the artifact required to reproduced the main results from their article.
+In order to improve the reproducibility of articles in Computer Science, the community set up \adae\ processes~\cite{kidwell2016badges} where authors would \emph{voluntary} submit the artifact required to reproduced the main results from their article.
 Then, artifact reviewers would try to reproduce those main results given the artifact from the authors.
 Based on the result of the reproduction attempt, the article is then awarded \emph{badges} to promote its reproducibility aspect~\cite{acm-badges}.
-The link to the artifacts can be found in the published version of the article, sometimes with an appendix giving more information about the artifact (\eg\ download instructions, hardware requirements, workflow)~\cite{paperswithcode, kang2023papers, hong2013software}.
+The link to the artifact can be found in the published version of the article, sometimes with an appendix giving more information about the artifact (\eg\ download instructions, hardware requirements, workflow)~\cite{paperswithcode, kang2023papers, hong2013software}.
 
 One difficult aspect of creating a truly reproducible artifact is to properly control the software environment: packages and libraries versions.
-Several works already shed light on the possible variability of results given a badly captured software environment \cite{mytkowicz_producing_nodate}.
-To tackle this issue, the conference \adae\ committees have been asking the authors to provide containers or virtual machines to share their artifacts in order to ``freeze'' their software environment.
+Several works already shed light on the possible variability of results given a badly captured software environment \cite{mytkowicz_producing_nodate} \todo{more}.
+To tackle this issue, the conference \adae\ committees have been advising authors to provide containers or virtual machines to share their artifacts in order to ``freeze'' their software environment~\cite{eurosys25, aetips, csartifacts}.
 %However, authors generate their artifact right before the artifact submission~\cite{guilloteau2024longevity, guilloteau2024frustrations}.
-In the case of usual virtualization techniques to generate containers or virtual machines, authors have to write the recipe made of a list of commands to execute from a base image.
+In the case of usual virtualization techniques to generate containers or virtual machines, authors have to write the ``recipe'' made of a list of commands to execute from a ``base image'' (for example, \df\ for Docker containers).
 This approach has several limitations.
 First, these base images can vary, either because of bad practices from the users (\eg\ using the \texttt{latest} version of the images) or from the administrators of the image (\eg\ pushing a different image to a previously defined tag).
 These base images can also be removed by the administrators making all the recipes unbuildable~\cite{nvidia_cuda_lifetime}.
 Another limitation of this approach is the heavy dependency on non-reproducible tools such as classical package managers (\eg\ \texttt{apt}, \texttt{dpkg}, \texttt{yum}).
-Hence, rebuilding a recipe of a container or a virtual machine can yield different results from the authors' image, and thus break the reproducibility of the results.
+Hence, rebuilding a recipe of a container or a virtual machine can yield different results from the authors' image, and thus threatens the reproducibility of the results.
 One solution would be for the authors to store the built container itself (\ie\ the tarball) onto some long term storage for example Zenodo~\cite{zenodo}.
-But this come with the downside of requiring more storage space than just storing the recipe (binary vs. text file).
-This practice has thus some \textbf{severe scalability and sustainability issues in terms of longevity}~\cite{guilloteau2024longevity}.
+But this come with the downside of requiring more storage space than just storing the recipe (binary vs. text file), and thus has some \textbf{severe scalability and sustainability issues in terms of longevity}~\cite{guilloteau2024longevity}.
 Moreover, storing the built binary image exhibits limitations when needed to \emph{inspect} the actual content of the image, and when a modification of the software environment capture by this image is needed~\cite{mercier2018considering}.
 Having the opportunity to extend previous scientific work is a crucial aspect in any scientific field.
 
@@ -256,8 +255,8 @@ Having the opportunity to extend previous scientific work is a crucial aspect in
 %A better solution would be to use tools such as Nix~\cite{dolstra_nix_2004} or Guix~\cite{courtes_functional_2013} which are focused on reproducibility and which are able to rebuild the \emph{exact same} software environment from a textual description and with longevity properties~\cite{courtes2024source}, but these tools are unfortunately poorly adopted by the community~\cite{guilloteau2024longevity}.
 
 
-In this paper, we propose our \textbf{initial design of a longitudinal study of the variations through time of the software environment produced by \df s from research artifacts.}
-We show initial results from five \df s extracted from the EuroPar'24 conference reproducibility artifacts built every month for six months.
+In this paper, we propose our \textbf{initial design of a longitudinal study of the variations of the software environments produced by \df s from research artifacts.}
+We show initial results from five \df s extracted from the EuroPar'24 conference reproducibility artifacts built every month for seven months.
 % \todo{The goal is not to dunk on authors or conferences, but simply to exhibit the potential issues with \df s.}
 
 % We aim to answer the following questions:
@@ -269,8 +268,8 @@ We show initial results from five \df s extracted from the EuroPar'24 conference
 % \item Which practices in \df s are the most damaging to reproducibility?
 % \end{enumerate}
 
-The following of this paper is organized as follows:
-Section~\ref{sec:ecg} presents our software framework for this longitudinal study.
+The remainder of this paper is organized as follows:
+Section~\ref{sec:ecg} presents \ecg, our software framework for this longitudinal study.
 The protocol is presented in Section~\ref{sec:protocol}.
 Section~\ref{sec:results} presents the initial results of a small scale version of the study.
 Finally, we conclude and give perspectives in Section~\ref{sec:conclusion}.
@@ -285,19 +284,19 @@ Finally, we conclude and give perspectives in Section~\ref{sec:conclusion}.
 %% \item end goal of the project
 %% \end{itemize}                   
 
-In this section, we present \ecg, a tool for the periodic building of \df s from research artifacts and the collection of software environment information.
+In this section, we present \ecg, a tool for building \df s from research artifacts and collecting information on their produced software environment.
 \ecg\ is a 280-line Python3 script~\cite{ecg} under the GPLv3 license.
 
 \subsection{Artifact representation}\label{sec:nickel}
 
 With \ecg, a \df\ from an artifact is represented as a Nickel configuration file~\cite{nickel}.
 Nickel is a configuration language with functional paradigm.
-One of its features is the possibility to \emph{verify} that a configuration is valid with respect to a \emph{contract}.
-The Nickel file representing the artifact is then \emph{verified} against the contract~\cite{ecg_contract} and translated to a JSON file fed to \ecg.
+One of Nickel's features is the possibility to \emph{verify} that a configuration file is valid with respect to a \emph{contract}.
+The Nickel file representing the artifact is then \emph{verified} against the contract~\cite{ecg_contract} and translated to a JSON file given as input to \ecg.
 The contract is versioned to take into account the potential future changes to the descriptions and the contract.
 Listing~\ref{lst:nickel} shows an example of Nickel representation.
 
-\begin{lstlisting}[caption=Example of Artifact Nickel representation\label{lst:nickel}]
+\begin{lstlisting}[caption=Example of Artifact Nickel representation, label=lst:nickel]
 {
   version = "1.0",
   artifact_url = "https://zenodo.org/.../artifact.zip",
@@ -322,12 +321,14 @@ Listing~\ref{lst:nickel} shows an example of Nickel representation.
 
 \subsection{Information captured by \ecg}\label{sec:ecg:capture}
 
+This section presents the different information collected by \ecg, and their motivations.
+
 \subsubsection{Hash of the Artifact}
 
 The articles give the link to the artifact.
 This artifact can be shared in several ways, but not all ways have the same guarantees in terms of longevity and ``stability'' of the link.
 Hence, we capture the result of the download at the given link (success or error).
-In case of a successful download, we also compute the cryptographic hash of the result of the download to capture any variation in the source of the artifact which could explain later variations in the resulting software environment.
+In case of a successful download, we also compute the cryptographic hash of the result of the download to capture any variation in the source of the artifact which could later explain variations in the resulting software environment.
 
 For instance, authors can give the link to a Zenodo archive that will \emph{always} point to the latest version of an artifact.
 Hence, the content of the artifact behind this link can change through time.
@@ -336,12 +337,11 @@ Hence, the content of the artifact behind this link can change through time.
 
 In the case of a \df s failing to build, we capture the error (missing image, failing command, etc.).
 In fact, we are only able to capture the \emph{first error} of the build even if there might be several errors in the building process.
-The Docker error is extracting by \texttt{grep}ing the building process log.
+The Docker error is extracted by \texttt{grep}ing the building process log.
 
 \subsubsection{List of Installed Packages and their Version}
 
-The software environment can be composed of several packages.
-Theses packages can have been installed by different means.
+The software environment can be composed of several packages, which can have been installed by different means.
 The most common way is through package managers (\eg\ \texttt{apt}, \texttt{dpkg}, \texttt{yum}).
 But there are also installed packages for programming languages such as with \texttt{pip} for Python.
 Another way to install package is to download the sources and build them locally.
@@ -360,9 +360,9 @@ Hence, \ecg\ will download \emph{locally} the source code pointed by the URL and
 
 \begin{figure*}
   \centering
-  \fbox{
-  \includegraphics[width=\textwidth]{./figs/workflow.pdf}
-  }
+  %\fbox{
+  \includegraphics[width=1\textwidth,trim={1.40cm 1.65cm 1.65cm 1.65cm},clip]{./figs/workflow.pdf}
+  %}
   \caption{
     Workflow of \ecg.
     Each description of an artifact is verified with the Nickel contract and then converted in a JSON representation.
@@ -377,13 +377,14 @@ Hence, \ecg\ will download \emph{locally} the source code pointed by the URL and
 \end{figure*}
 
 The workflow of \ecg\ is depicted in Figure~\ref{fig:workflow}.
-We make sure to use an empty local Docker cache before building the containers.
+% We make sure to use an empty local Docker cache before building the containers.
 The workflow itself is ruled by a Snakemake~\cite{koster2012snakemake} description and its software environment is managed with Nix~\cite{dolstra_nix_2004}.
 
 \subsection{Contributions}
 
 This framework leaves a lot of room for contributions on the writing of the Nickel descriptions files.
 The community could contribute by submitting pull requests on the open source repository containing all the Nickel descriptions.
+\todo{more}
 
 \section{Protocol}\label{sec:protocol}
 
@@ -393,14 +394,15 @@ In this section, we present the initial protocol of our longitudinal study.
 \item For each conference with an artifact evaluation process, we look at all the artifacts and consider only the artifacts using a \df\ to share their software environment.
 \item From the artifact and the \df, we write the associated Nickel file (Listing~\ref{lst:nickel}): where is stored the artifact? how to extract the \df\ out of the artifact? which package managers are used?
 \item Once all the Nickel descriptions for the artifacts of a conference have been written, we use \ecg\ to build the download, build, and extract the information out of each of them.
-\item We run \ecg\ the closer to the start of each month as possible.
+%\item We run \ecg\ the closer to the start of each month as possible.
 \item The local Docker cache of these machine is cleaned before the building of each container.
-\item We will execute \ecg\ on each artifact every month for a full year (13 months).
+\item We will execute \ecg\ on each artifact every month, as close as possible to the start of the month, for a full year (\ie\ 13 months).
 \end{enumerate}
 
 \paragraph{Details}
 
 \begin{itemize}
+\item We make sure to use an empty local Docker cache before building the containers.
 \item Each container has an allocated time of 10 minutes to build.
 \item \ecg\ is executed on the x86-64 machines of the \grid\ platform~\cite{grid5000} on the \texttt{dahu} cluster of the Grenoble site.
 \end{itemize}
@@ -425,12 +427,12 @@ In this section, we present the initial protocol of our longitudinal study.
 
 % And there is no ``warning message'' that the environment is different.
 
-We wrote the descriptions in Nickel (see Section~\ref{sec:nickel}) for the five artifacts of the EuroPar'24 conference that used a Docker container to share their software environments, and used \ecg\ to build the associated \df s once every month for six months.
+We wrote the descriptions in Nickel (see Section~\ref{sec:nickel}) for the five artifacts of the EuroPar'24 conference that used a Docker container to share their software environments, and used \ecg\ to build the associated \df s once every month for seven months.
 % "2024-10-01" "2024-11-04" "2024-12-02" "2025-01-02" "2025-02-05" "2025-03-12"
-The initial build was October 1$^{st}$ 2024, then the following builds were on November 4$^{th}$ 2024, December 2$^{nd}$ 2024, January 2$^{nd}$ 2025, February 5$^{th}$ 2025, and March 12$^{th}$ 2025.
+The initial build was October 1$^{st}$ 2024, then the following builds were on November 4$^{th}$ 2024, December 2$^{nd}$ 2024, January 2$^{nd}$ 2025, February 5$^{th}$ 2025, March 12$^{th}$ 2025, and April 1$^{st}$ 2025.
 The deadline to submit the artifacts was May 15$^{th}$ 2024\footnote{\url{https://2024.euro-par.org/calls/artifacts/}}.
 %\todo{when was the artifact submission, and publicaiton of the papers for europar?}
-The data collected is available on Zenodo~\cite{dataset_europar24}.
+The data collected is available on Zenodo~\cite{dataset_europar24}. \todo{update zenodo with the april measures}
 
 The following sections follow the dimensions captured by \ecg\ (see Section~\ref{sec:ecg:capture}).
 
@@ -448,20 +450,20 @@ All the artifacts managed to successfully produce a container.
 
 \begin{table}
   \centering
-  \scalebox{0.925}{
+  \scalebox{0.850}{
   \begin{tabular}{llll}
     \toprule
     Artifact & Base image & Version & \texttt{update}?\\
     \midrule
-    \texttt{canon\_solving} & \texttt{ubuntu} & \texttt{22.04} & Yes \\
-    \texttt{geijer\_how}    & \texttt{ubuntu} & \texttt{22.04} & Yes \\
-    \texttt{hiraga\_peanuts}& \texttt{devcontainers/cpp} & \texttt{1-debian-12} & Yes \\
-    \texttt{munoz\_fault}   & \texttt{ubuntu} & \texttt{22.04} & Yes \\
-    \texttt{wolff\_fast}    & \texttt{ubuntu} & \texttt{22.04} & Yes \\
+    \texttt{canon\_solving}~\cite{canon_solving}   & \texttt{ubuntu} & \texttt{22.04} & Yes \\
+    \texttt{geijer\_how}~\cite{geijer_how}         & \texttt{ubuntu} & \texttt{22.04} & Yes \\
+    \texttt{hiraga\_peanuts}~\cite{hiraga_peanuts} & \texttt{devcontainers/cpp} & \texttt{1-debian-12} & Yes \\
+    \texttt{munoz\_fault}~\cite{munoz_fault}       & \texttt{ubuntu} & \texttt{22.04} & Yes \\
+    \texttt{wolff\_fast}~\cite{wolff_fast}         & \texttt{ubuntu} & \texttt{22.04} & Yes \\
     \bottomrule
   \end{tabular}
   }
-  \caption{Information about the \df s from the study}\label{tab:info}
+  \caption{Information about the \df s from the study.}\label{tab:info}
 \end{table}
 
 Table~\ref{tab:info} summarizes the information about the studied \df s.
@@ -482,7 +484,7 @@ However, all of the \df s called the \texttt{apt-get update} command, which fetc
 
 Figure~\ref{fig:results_per_artifact} depicts the evolution through time of the software environment produced by the \df\ of each studied artifact.
 We can see that even after \emph{a single month} of the initial build, the software environment is already different for \emph{all} of the studied artifacts.
-This is a severe threat to reproducibility as one month is the time-frame for a artifact evaluation process in conferences.
+This is a severe threat to reproducibility as one month is the time-frame for an artifact evaluation process in conferences.
 This means that the \df\ submitted by the authors can generate different software environment between the submission of the artifact and the reproduction attempt of the reviewers.
 
 
@@ -498,9 +500,10 @@ We can see that every month, new versions of packages are being introduced in th
   }\label{fig:results_per_tool}
 \end{figure}
 
-Figure~\ref{fig:results_per_tool} depicts the evolution of the package version managed by each tool: \texttt{dpkg}, \texttt{git}, \texttt{pip} and manual download and build (\texttt{misc}).
+Figure~\ref{fig:results_per_tool} depicts the evolution of the package versions managed by each tool present in the studied artifact: \texttt{dpkg}, \texttt{git}, \texttt{pip}, and manual download and build (\texttt{misc}).
 We can see that the tools introducing variation in the software environment are \texttt{dpkg} and \texttt{pip}.
 
+\todo{update with april measures}
 The packages that changed the most in terms of versions are:
 \begin{enumerate}
 \item \texttt{linux-libc-dev:amd64} (installed via \texttt{dpkg}) with 6 different versions for each artifact (1 per new build attempt)
@@ -561,9 +564,9 @@ The packages that changed the most in terms of versions are:
 % -----------------------------------------------------------------
 
 This paper presented the initial design of our longitudinal study of the evolution of the software environments produced by \df s.
-We presented in Section~\ref{sec:ecg} \ecg, and its workflow (Section~\ref{sec:workflow}), a tool to download, build and extract information from research artifacts \df.
+We presented in Section~\ref{sec:ecg} \ecg, and its workflow (Section~\ref{sec:workflow}), a tool to download, build and extract information from research artifacts \df s.
 Section~\ref{sec:protocol} presented the protocol to observe the potential variations in software environment through time.
-We showed initial results in Section~\ref{sec:results} on five artifacts from the EuroPar'24 conference built every month for six months.
+We showed initial results in Section~\ref{sec:results} on five artifacts from the EuroPar'24 conference built every month for seven months.
 
 While this initial study only considered five \df s, it revealed that \textbf{the software environments produced by the considered \df s variate \emph{every month}} which highlights the lack of reproducibility of such practices.
 The question of the significance of these results on such a small sample will need to be answered in a larger scale study.

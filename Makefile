@@ -1,11 +1,11 @@
 all: src/main.pdf
 
-ZENODO_URL:=https://zenodo.org/records/15077956/files/europar24.zip
+ZENODO_URL:=https://zenodo.org/records/15132467/files/europar24.zip
 
 FIGS:=src/figs/workflow.pdf src/figs/results_per_artifact.pdf src/figs/results_per_tool.pdf
 
 ARTIFACTS:=canon_solving geijer_how hiraga_peanuts munoz_fault wolff_fast
-DATES:=20241001 20241104 20241201 20250102 20250205 20250312
+DATES:=20241001 20241104 20241201 20250102 20250205 20250312 20250401
 
 DATA_PKGS:= $(foreach wrd,$(ARTIFACTS),$(foreach date,$(DATES), data/europar24/pkgs/$(wrd)/$(date).csv))
 DATA_BUILD_STATUS:= $(foreach wrd,$(ARTIFACTS),$(foreach date,$(DATES), data/europar24/build_status/$(wrd)/$(date).csv))

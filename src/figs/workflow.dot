@@ -4,7 +4,10 @@ digraph G {
   edge [fontname = "Handlee"];
 
   bgcolor=transparent;
-  rankdir="LR"
+  rankdir="LR";
+  ratio = compress;
+  ranksep=1;
+  //peripheries=0;
 
   subgraph cluster_0 {
     //style=filled;

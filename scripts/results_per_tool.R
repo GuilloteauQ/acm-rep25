@@ -30,12 +30,15 @@ p <- df %>%
 	ylab("Packages in environment [%]") +
 	facet_wrap(~tool, ncol = 2) +
 	ggtitle("Evolution of the packages versions through time") +
-	scale_fill_grey("Month when the package version\nwas introduced in the environment", labels=rev(append(c("Initial"), seq(length(dates)-1))))+
+	scale_fill_grey("Month when the package version was introduced in the environment", labels=rev(append(c("Initial"), seq(length(dates)-1))))+
 	scale_x_discrete("Months after initial build", labels=append(c("Initial"), seq(length(dates)-1))) +
+	guides(fill = guide_legend(reverse=TRUE, nrow=1, title.position ="top", theme = theme(
+	  legend.title = element_text(size = 9.2)
+	  ))) +
 	theme_bw() +
         theme(legend.position = "bottom", strip.background = element_blank(),
           plot.title.position = "plot",
           plot.caption.position =  "plot",
           legend.location = "plot")
 
-ggsave(plot=p,outfile, width=4, height=4.25)
+ggsave(plot=p,outfile, width=4, height=3.75)
