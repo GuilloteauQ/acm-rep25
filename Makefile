@@ -24,7 +24,7 @@ data/.ok: data/europar24.zip
 	unzip -d data/ $^ && touch $@
 
 $(DATA_PKGS) $(DATA_BUILD_STATUS) $(DATA_ARTIFACT_HASH): data/.ok
-	true 
+	@true 
 
 src/main.pdf: src/main.tex src/references.bib $(FIGS) $(INFO)
 	cd src && rubber -d main
