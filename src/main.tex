@@ -72,7 +72,8 @@
 \usepackage[inline]{enumitem}  % enhanced enumerations
 \usepackage{listings}
 
-\newcommand{\fmc}[1]{{\color{magenta}#1}} % Florina Ciorba
+% \newcommand{\fmc}[1]{{\color{magenta}#1}} % Florina Ciorba
+\newcommand{\fmc}[1]{{}} % Florina Ciorba
 
 \definecolor{commentcolour}{rgb}{0.04,0.43,0.17}
 \definecolor{keywordcolour}{rgb}{0.65,0.15,0.64}
@@ -248,8 +249,8 @@ This approach has several limitations.
 First, these base images can vary, either because of bad practices from the users (\eg\ using the \texttt{latest} version of the images) or from the administrators of the image (\eg\ pushing a different image to a previously defined tag).
 Administrators can also remove these base images, making all recipes un-buildable~\cite{nvidia_cuda_lifetime}.
 Another limitation of this approach is the heavy dependency on non-reproducible tools such as classical package managers (\eg\ \texttt{apt}, \texttt{dpkg}, \texttt{yum}).
-Hence, rebuilding a recipe of a container or a virtual machine can yield different results from the authors' image, and thus \fmc{endangers} the reproducibility of the results.
-One solution would be for the authors to store and then provide the built container itself (\ie tarball) on some long-term storage (for example, Zenodo~\cite{zenodo}).
+Hence, rebuilding a recipe of a container or a virtual machine can yield different results from the authors' image, and thus endangers the reproducibility of the results.
+One would be for the authors to store and then provide the built container itself (\ie tarball) on some long-term storage (\eg\ Zenodo~\cite{zenodo}).
 But this comes with the downside of requiring more storage space than just storing the recipe (binary vs. text file), and thus has some \textbf{severe scalability and sustainability issues in terms of longevity}~\cite{monroe2023preservation, guilloteau2024longevity}.
 Moreover, storing the built binary image exhibits limitations when needed to \emph{inspect} the actual content of the image, and when a modification of the software environment capture by this image is needed~\cite{mercier2018considering}.
 Having the opportunity to extend previous scientific work is a crucial aspect in any scientific field.
@@ -260,7 +261,7 @@ Having the opportunity to extend previous scientific work is a crucial aspect in
 
 
 In this paper, we propose our \textbf{initial design of a longitudinal study of the variations of the software environments produced by \df s from research artifacts.}
-We show initial results from five \df s extracted from the Euro-Par 2024 conference reproducibility artifacts built every month for seven months. \fmc{Could we give here the period October 1st, 2024 - April 1st, 2025 of these 7 months?}
+We show initial results from five \df s extracted from the Euro-Par 2024 conference reproducibility artifacts built every month for seven months, from October 1$^{st}$ 2024 to April 1$^{st}$ 2025.
 % \todo{The goal is not to dunk on authors or conferences, but simply to exhibit the potential issues with \df s.}
 
 % We aim to answer the following questions:
@@ -325,7 +326,7 @@ The contract is versioned (line 2 of Listing~\ref{lst:nickel}) to take into acco
 
 \subsection{Information captured by \ecg}\label{sec:ecg:capture}
 
-This section presents the different information collected by \ecg, and their motivations.
+This section presents the different information collected by \ecg.%, and their motivations.
 
 \subsubsection{Cryptographic Hash of the Artifact}
 
@@ -387,7 +388,8 @@ The workflow itself~\cite{ecg_workflow} is governed by a Snakemake~\cite{koster2
 
 \section{Protocol}\label{sec:protocol}
 
-In this section, we present the initial protocol of our longitudinal study.
+% In this section, we present the initial protocol of our longitudinal study.
+This section presents the initial protocol of our longitudinal study.
 
 \begin{enumerate}
 \item For each conference with an artifact evaluation process, we examine all artifacts and consider only those that share their software environment using a \df.
