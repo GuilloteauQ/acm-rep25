@@ -29,7 +29,7 @@ p <- df %>%
 	geom_text(data = . %>% filter(as.character(rank) == dates[1]), aes(y = (100 * total/total_pkgs) - 15, label = paste("(",round(100*total/total_pkgs, digits = 1), "%)",sep="")), angle=0, size=1.5) +
 	ylab("Packages in environment [%]") +
 	facet_wrap(~tool, ncol = 2) +
-	ggtitle("Evolution of the packages versions through time") +
+	ggtitle("Evolution of the packages versions over time") +
 	scale_fill_grey("Month when the package version was introduced in the environment", labels=rev(append(c("Initial"), seq(length(dates)-1))))+
 	scale_x_discrete("Months after initial build", labels=append(c("Initial"), seq(length(dates)-1))) +
 	guides(fill = guide_legend(reverse=TRUE, nrow=1, title.position ="top", theme = theme(

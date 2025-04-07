@@ -114,7 +114,7 @@
 
 \title{%
   % (Very) Preliminary Study of the Longevity of Docker Images from Research Artifacts
-  Longitudinal Study of Software Environments Produced by Dockerfiles from Research Artifacts: Initial Design% and Results
+  SHORT: Longitudinal Study of Software Environments Produced by Dockerfiles from Research Artifacts: Initial Design% and Results
 }
 
 % \author{Quentin Guilloteau}
@@ -251,6 +251,7 @@ The link to the artifact can be found in the published version of the article, s
 One difficult aspect of creating a truly reproducible artifact is to properly control the software environment: packages and libraries versions.
 Several works already shed light on the possible variability of results given a badly captured software environment~\cite{mytkowicz_producing_nodate, sokolowski2024impact}.
 To address this issue, the conference \adae\ committees have advised authors to provide containers or virtual machines to share their artifacts in order to ``freeze'' their software environment~\cite{eurosys25, aetips, csartifacts}.
+In practice, about 12\% of the artifacts use such tools~\cite{guilloteau2024longevity}.
 %However, authors generate their artifact right before the artifact submission~\cite{guilloteau2024longevity, guilloteau2024frustrations}.
 In the case of usual virtualization techniques to generate containers or virtual machines, authors have to write the ``recipe'' (for example, \df\ for Docker containers) made of a list of commands to execute from a ``base image'' (the \texttt{FROM} instruction in \df s).
 This approach has several limitations.
@@ -270,6 +271,7 @@ Having the opportunity to extend previous scientific work is a crucial aspect in
 
 In this paper, we propose our \textbf{initial design of a longitudinal study of the variations of the software environments produced by \df s from research artifacts.}
 We show initial results from five \df s extracted from the Euro-Par 2024 conference reproducibility artifacts built every month for seven months, from October 1$^{st}$ 2024 to April 1$^{st}$ 2025.
+We focus only on Docker containers as they are the most used in artifacts~\cite{guilloteau2024longevity}.
 % \todo{The goal is not to dunk on authors or conferences, but simply to exhibit the potential issues with \df s.}
 
 % We aim to answer the following questions:
@@ -342,7 +344,7 @@ The authors can share artifacts in several ways, but not all ways have the same 
 Hence, \ecg\ captures the result of the download at the given link (success or error).
 In case of a successful download, \ecg\ computes the cryptographic hash of the download result to capture any variation in the source of the artifact which could later explain variations in the resulting software environment.
 
-For example, authors can link to a Zenodo archive that will \emph{always} point to the latest version of an artifact.
+For example, authors can link to a Zenodo archive that will \emph{always} point to the latest artifact version.% of an artifact.
 Hence, the content of the artifact behind this link can change over time.
 
 \subsubsection{Docker Building Error}
@@ -409,7 +411,6 @@ This section presents the initial protocol of our longitudinal study.
 \end{enumerate}
 
 \paragraph{Details}
-
 \begin{itemize}
 \item We ensure that an empty local Docker cache is used before building the containers.
 \item Each container is allocated a 10-minute time frame to build.
@@ -423,8 +424,6 @@ We wrote the descriptions in Nickel (see Section~\ref{sec:nickel}) for the five 
 The initial build was October 1$^{st}$ 2024, then the following builds were on November 4$^{th}$ 2024, December 2$^{nd}$ 2024, January 2$^{nd}$ 2025, February 5$^{th}$ 2025, March 12$^{th}$ 2025, and April 1$^{st}$ 2025.
 The deadline for the authors to submit their artifacts to Euro-Par 2024 was May 15$^{th}$ 2024\footnote{\url{https://2024.euro-par.org/calls/artifacts/}}.
 Hence, our initial build took place almost 5 months after the artifacts submission.
-
-
 The following sections follow the dimensions captured by \ecg\ (see Section~\ref{sec:ecg:capture}).
 The data collected and presented in this section is available on Zenodo~\cite{dataset_europar24}.
 
@@ -470,10 +469,10 @@ However, all \df s called the \texttt{apt-get update} command, which fetches the
   \centering
   \includegraphics[width=\textwidth]{./figs/results_per_artifact.pdf}
   \caption{
-    Evolution of the packages in the software environment of each container through time.
-    Each container has been rebuilt once a month.
+    Evolution of the packages in the software environment of each container over time.
+    %Each container has been rebuilt once a month.
     The color of the bar corresponds to the month when a specific version of a package has been introduced in the software environment.
-    We can see that the proportion of package versions similar to the versions in the initial build is decreasing through the months.
+    We can see that the decrease of the proportion of package versions similar to the versions in the initial build over time.
   }
   \label{fig:results_per_artifact}
 \end{figure*}
