@@ -1,0 +1,368 @@
+\documentclass[%
+	11pt,
+	final,
+]{article}
+
+% === PACKAGES IMPORT / CONFIGURATION =========================================
+
+% --- ENCODING / FONTS -----------------
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\usepackage{lmodern}  % vector fonts
+
+% --- LAYOUT ---------------------------
+
+\usepackage[%
+	a4paper,
+	margin=20mm,  % tighter margins
+]{geometry}
+
+% --- MATHEMATICS TYPESETTING ----------
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+% \usepackage{amsthm}
+
+% --- GRAPHICS / FIGURES ---------------
+
+%\usepackage{cbfcolors}
+\usepackage{graphicx}
+\usepackage{standalone}
+\usepackage{subcaption}
+\usepackage{xcolor}
+
+\usepackage{tikz}
+% \usetikzlibrary{babel}  % avoid annoying interaction of babel with tikz
+\usetikzlibrary{calc}
+\usetikzlibrary{fit}
+
+% --- LISTINGS / ALGORITHMS ------------
+
+\usepackage{algorithm2e}  % pseudo-code
+
+% --- ENHANCED TABLES ------------------
+
+\usepackage{booktabs}  % publication quality tables
+
+% --- CITATIONS ------------------------
+
+\RequirePackage[%
+	style=numeric,
+	sortcites=true,
+	giveninits=true,
+	isbn=false,
+]{biblatex}
+
+\addbibresource{references.bib}
+
+
+% --- MISC. PACKAGES -------------------
+
+\usepackage[inline]{enumitem}  % enhanced enumerations
+\usepackage[strict=true]{csquotes}  % advanced quotes
+\usepackage{siunitx}  % correct units for physical quantities
+
+\usepackage{mdframed}
+\mdfdefinestyle{alert}{%
+	frametitlealignment=\noindent,%
+	linewidth=3pt,%
+	hidealllines=true,%
+	leftline=true,%
+	rightline=true,%
+}
+\newmdenv[%
+	style=alert,%
+	linecolor=cyan,%
+	backgroundcolor=cyan!10,%
+	frametitle=Answer,%
+]{review-answer}
+
+
+% --- PDF SUPPORT ----------------------
+
+\usepackage{hyperref}  % import as last package
+\usepackage[capitalise]{cleveref}  % import after hyperref
+
+% === MACROS DEFINITION =======================================================
+
+% --- COMMON ABBREVIATIONS MACROS ------
+
+% latin abbreviations, see:
+%   - http://www.sussex.ac.uk/informatics/punctuation/capsandabbr/abbr
+% comment by Sascha Hunold, see also:
+%   - https://www.ieee.org/documents/style_manual.pdf
+%     (p. 32, Short Reference List of Italics)
+%   - http://web.ece.ucdavis.edu/~jowens/commonerrors.html
+
+\newcommand{\eg}{e.g.\@}
+\newcommand{\ie}{i.e.\@}
+\newcommand{\cf}{cf.\@}
+\newcommand{\circa}{ca.\@}
+\newcommand{\perse}{\emph{per~se}}
+\newcommand{\adhoc}{\emph{ad~hoc}}
+\newcommand{\sic}{\emph{sic}}
+\newcommand{\versus}{\emph{vs.\@}}
+\newcommand{\aka}{a.k.a.\@}
+\newcommand{\resp}{resp.\@}
+\newcommand{\wrt}{w.r.t.\@}
+
+\makeatletter
+\newcommand{\etc}{etc\@ifnextchar.{}{.\@}}
+\newcommand{\etal}{et~al\@ifnextchar.{}{.\@}}
+\makeatother
+
+\newcommand{\reviewitem}[2]{\paragraph{#1:} #2}
+
+
+% === META DATA ===============================================================
+
+\title{%
+  SHORT: Longitudinal Study of Software Environments Produced by Dockerfiles from Research Artifacts: Initial Design
+	\\
+	{\Large%
+	Answer to reviewers
+	}
+}
+
+\author{Anonymous Authors}
+\date{}
+
+
+\begin{document}
+
+\maketitle
+
+This document is composed of three parts:
+
+\begin{enumerate}
+\item the detailed answers to the reviewers comments
+\item a ``diff'' between the initial submission and the new submission (additions in underlined blue, deletion in crossed-out red)
+\item the new submission
+\end{enumerate}
+
+\section{Review 1 (weak reject)}
+
+Thank you for submitting your work at REP. Overall, focusing on reliability of reproducibility packages is a worthy endeavour, and well in-scope for this conference. The paper was also clearly written, however, I also have several concerns about this work, namely:
+
+
+\begin{itemize}
+\item The investigation is limited to only five artifacts from a single conference
+
+\begin{review-answer}
+  This initial study is indeed limited to five artifact from a single conference (Euro-Par24).
+  The goal of this short paper is to investigate the necessity and potential of a larger scale study.
+\end{review-answer}
+
+\item Some aspects of the proposed system are unexplained and/or confusing.
+  \begin{itemize}
+   \item It is unclear what is the role of Nickel ad why there is need for an artifact representation in this framework - aren't Dockerfile sufficient to carry the same information?
+\begin{review-answer}
+  Nickel is simply a configuration language (like JSON or YAML), but with the possibility to define constraints on the configurations' structures and values, named ``contract''s.
+
+  We cannot simply use/parse Dockerfiles to extract the same information.
+  Indeed, the authors crafting their Dockerfile could do the installation of their software dependencies in a shell script that will then be called in the steps of the Dockerfile.
+  The content of this script is unknown at the level of the Dockerfile.
+  Hence the need to capture and describe all the downloads and installations to create the final Docker image.
+
+
+  To improve clarity, we swapped Section 2.1 and Section 2.2, and argumented more the use of the Nickel representation.
+\end{review-answer}
+   \begin{itemize}
+    \item Snakemake and Nix are mentioned without being introduced
+      \begin{review-answer}
+        We added a description of those tools in Section 2.3.
+      \end{review-answer}
+    \item From the description, the proposed toolchain appears capable to determine whether an environment can be built, but says nothing about whether experiments can actually be reproduced, which seems to miss the main problem with artifacts
+      \begin{review-answer}
+        That is correct, we only rebuild the Docker image, but do not reproduce the experiments.
+        The reason is two-fold:
+        \begin{itemize}
+        \item The impact of software environment variations on experiments results have been heavily studied (see references [28, 32] ([27, 31] in the initial submission), cited in the second paragraph of the introduction)
+        \item The energy-costs of actually reproducing the experiments for which the toolchain determined that the environment can be built must be weighed against the utility of reproducing those experiments. The goal of our short paper is to prove the concept of experiment building over time. This benefits researchers that indeed want/need to reproduce specific experiments and justify the associated energy-costs
+        \end{itemize}
+
+
+        We added a sentence in Section 3 to make this point more explicit.
+      \end{review-answer}
+    \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+Overall, while the idea is interesting, the approach and the evaluation thus have significant practical limitations.
+
+\begin{review-answer}
+  Indeed, the approach needs to be further developed and tested with a larger collection of artifacts, as we stated in the \emph{Perspectives} section.
+  The extent of our current submission is a short-paper describing a proof of concept.
+\end{review-answer}
+
+
+\section{Review 2 (weak accept)}
+
+\subsection{Overview}
+
+This paper contributes to the litterature on Software Engineering, Reproducibility, and reproducibility of Sciences.
+
+It introduces ecg, a tool used to rebuild Dockerfiles and analyse potential reproducibility issues.
+It showcases the use of the tools by studying the evolution in time of 5 Dockerfile extracted from the Euro Par 2024 conference.
+
+\subsection{Strenght}
+
+\begin{itemize}
+\item The topic is novel, relevant and in my opinion important. 
+\item Contribution of a tool that can be used to conduct further experiments
+\item Valuable first insights from the experiments
+\end{itemize}
+
+\subsection{Weeknesses}
+ 
+\begin{itemize}
+\item In my opinion the paper could be made more clear maybe by focusing on the most important elements: for example, you example that you use Nickel to reprensent artifacts, but it is unclear to me from the rest of the paper what is the added value for the experimental protocal. What happens if the Nickel ``contract'' is not respected ?
+\begin{review-answer}
+  Nickel is simply a configuration language (like JSON or YAML), but with the possibility to define constraints on the configurations' structures and values, named ``contract''.
+
+  If the Nickel contract is not respected, then this means that the Nickel representation of the artifact's Dockerfile (Listing 1) does not respect the ``model'' (in the UML sense) / structure and content expected by \texttt{ecg} (the script performing the downloading, the building and the informtation extracting of the Docker image from the research artifact).
+  The transformation from the Nickel representation to the JSON representation (given as input to \texttt{ecg}) will return an error, and the workflow will not even try to rebuild this Docker image.
+
+
+  To improve clarity, we swapped Section 2.1 and Section 2.2, and argumented more the use of the Nickel representation.
+\end{review-answer}
+\end{itemize}
+
+\subsection{Remarks}
+
+\begin{itemize}
+\item On the topic of software environment reproducibility, ``Reproducibility of Build Environments through Space and Time'' \url{https://dl.acm.org/doi/10.1145/3639476.3639767} would be good to cite.
+  \begin{review-answer}
+    We added a citation this paper in the Conclusion section (Reference [25]).
+  \end{review-answer}
+\end{itemize}
+
+
+\section{Review 3 (accept)}
+
+As a short paper, the authors evaluate five AD/AE appendices from EuroPar 2024 papers and study the Dockerfiles associated with these artifacts.
+They study the variation of the software environment represented by the software and then report on the variation every month for a period of six months.
+A key problem with the difference in software environments is that there is an apt-update command that refreshes the base image with updated packages.
+It is not clear if this update - which is responsible for the variation reported - broke the software being studied, or if it still worked.
+\begin{review-answer}
+  This question has been studied in the litterature (see for example the citations [28, 32] ([27, 31] in the initial submission) cited in second paragraph of the introduction), and is not addressed in this paper.
+
+
+We added a sentence in Section 3 to make this point more explicit.
+\end{review-answer}
+An easy fix would be to remove the apt-update and keeping the base image with a version.
+\begin{review-answer}
+  The preliminary results presented in this paper show that using tools such as \texttt{pip} also introduce variation in their produced software environment (see Figure 3).
+\end{review-answer}
+Other methods suggested include keeping a binary image as a Docker image or a Singularity image so we can freeze the environment for the paper.
+\begin{review-answer}
+  While this is true, we do not think that this approach is sustainable.
+  Storing Gigabytes of binary container images on long-term storage is much more expensive than storing a few kilobytes text file.
+  This point is discussed in the Introduction.
+\end{review-answer}
+There are some typos - mostly with spacing - that need to be fixed (latest artifact version.Hence -> version. Hence, Dockerfilewe -> Dockerfile we).
+\begin{review-answer}
+  The typos have been corrected.
+\end{review-answer}
+The tool developed by the authors (ecg) is provided with an anonymized URL and source code available for download with the GPLv3 license.
+
+
+\section{Review 4 (weak reject)}
+
+The paper "Longitudinal Study of Software Environments Produced by Dockerfiles from Research Artifacts: Initial Design" addresses an important and well-recognized issue in computational reproducibility: Docker containers, while widely used, are not inherently reliable for long-term archiving and reproducibility. 
+
+The authors confirm that independently building containers from the same Dockerfile can lead to different results due to changes in software versions and dependency drift, a problem previously documented in the reproducibility literature (e.g., "Reproducibility, Replicability, and Repeatability: A Survey of Reproducible Research with a Focus on High Performance Computing," \url{https://arxiv.org/pdf/2402.07530}).
+
+\begin{review-answer}
+The paper proposed by the reviewer does not document this issue: it claims (in the last paragraph of page 31) that there is an issue without showing any proof of it.
+This is a common claim what we have seen in the litterature, but we have yet to see any proof of it.
+Our work therefore aims to bring evidence supporting the claim that the reproducibility of Sofware Environments decays over time.
+
+We added a sentence at the end of the introduction to explicit this gap in the litterature.
+\end{review-answer}
+
+In their study, the authors monitored Docker containers associated with published Euro-Par papers and observed that software dependencies inside containers do indeed evolve over time, potentially impacting the results produced by those containers.
+As a solution, they propose an approach that combines using a textual description of the container build process and monitoring dependencies through tools such as Snakemake and Nix.
+
+
+
+
+While I fully agree with the authors that Docker containers alone are insufficient to guarantee reproducibility, I have several concerns regarding the proposed solution.
+Primarily, the suggested approach does not seem to fundamentally resolve the core issue of dependency management.
+\begin{review-answer}
+  There might be a misunderstanding.
+  We do not propose another format to generate and share container images.
+  We use the textual representation presented in Section 2.2 (Section 2.1 in the initial submission) to track what are the downloads and installations done in a Dockerfile from a research artifact.
+  We then build the Docker image from the Dockerfile, and use our representation to perform the operation required to extract information about the generated software environment.
+  We need this representation because we cannot simply use the Dockerfile to extract the information about which package is installed and how.
+  There are some cases where authors write a shell scripts doing the installation of packages (\eg\ calls to \texttt{apt install}) and from the point of view of the Dockerfile these installation steps are not visible.
+  Hence, we gather all the information about the downloads and installations in one textual representation: the one presented in Section 2.2 (Section 2.1 in the initial submission).
+
+
+  To improve clarity, we swapped Section 2.1 and Section 2.2, and argumented more the use of the Nickel representation.
+\end{review-answer}
+Furthermore, the paper lacks a comparison with existing, widely adopted industrial practices for achieving reproducibility, particularly in domains like AI and machine learning.
+\begin{review-answer}
+  This is correct, and explicited in the \emph{Perspectives} section of the article.
+  As this is a short paper and an initial design of what might be a larger scale experiment, we focused on a conference of our field (HPC), where we more used to the tools and practices.
+  Previous study have shown that Docker is the main container tool used to produce container for research artifacts in HPC (see reference [20]), hence this initial focus on Docker.
+\end{review-answer}
+
+Current best practices in industry involve:
+
+\begin{review-answer}
+  There are indeed best practices than artifact authors can follow.
+  Let us note that the practices of academia differ to the practices of industry, where the objectives are different.
+  Having authors following better practices would be ideal, but unfortunately it is not the case.
+\end{review-answer}
+
+\begin{itemize}
+\item Using stable base images and archiving them;
+  \begin{review-answer}
+    While this practice does improve long-term reproductiblity, it lacks scalability and sustainability as storing Gibabytes of binary is much more expensive than storing a few kilobytes of plain text.
+    This point as been discussed in the conclusion section of the article.
+  \end{review-answer}
+\item Avoiding commands like "apt update" within Dockerfiles;
+\item Explicitly specifying and fixing system-level dependencies using tools like apt, dpkg;
+\item Managing Python dependencies precisely via pip, poetry, or uv;
+  \begin{review-answer}
+    From our understanding, this only guarentees the top-level dependencies to be correct, but if there are dependencies of those dependeices that have not been captured correctly, the final software environment might still differ.
+  \end{review-answer}
+\item Fetching code and artifacts using fixed hashes (e.g., via Git or direct downloads).
+  \begin{review-answer}
+    Using Git and direct downloads does not guarantees long-term reproducibility.
+    The content behind a direct download can change while the URL stays the same.
+    Git commits can be remove/rewritten and repositories deleted.
+
+    This point has been discussed in the sections 2.1.1 and 2.1.3 (sections 2.2.1 and 2.2.3 in the initial submission).
+  \end{review-answer}
+\end{itemize}
+
+These practices, when rigorously followed, can improve reproducibility within standard Docker workflows without introducing new tooling or formats.
+\begin{review-answer}
+  These practices might indeed improve reproducibility, while to garenteeing anything.
+  We agree with the reviewer on the ``rigorously'' and ``improve'' terms.
+  The issue is that it is nearly impossible to create a docker image that will be reproducible over time, but it is very easy to create a docker image that works now.
+  So the reframed question is ``Are container recipes a real solution to the reproducibility problem like the calls for artifacts seem to claim?''.
+
+  The bold text in the Conclusion section summarizes this point.
+\end{review-answer}
+Consequently, it appears that the reproducibility guarantees offered by the proposed approach could, in fact, be achieved using current methods without the added complexity of additional tools.
+\begin{review-answer}
+  We are not proposing a new format to build and share container images.
+\end{review-answer}
+
+Therefore, before introducing new tools and formats, it would strengthen the paper to include a detailed comparison with these existing reproducibility strategies and methodologies.
+Such a comparison would help to clarify the unique advantages of the proposed method and better position it within the landscape of current solutions.
+
+Overall, this paper identifies a significant problem and provides useful empirical data, but its proposed solution requires further development, particularly through a more rigorous evaluation against established practices.
+
+\begin{review-answer}
+  We fully acknowlege that a wider evaluation is required to target a full publication.
+  As stated in the conclusion section (section 5), this short paper aims to be an initial version of a larger scale study.
+\end{review-answer}
+
+\end{document}

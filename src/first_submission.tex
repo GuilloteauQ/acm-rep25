@@ -249,7 +249,7 @@ Based on the result of the reproduction attempt, the article is awarded \emph{ba
 The link to the artifact can be found in the published version of the article, sometimes with an appendix giving more information about the artifact (\eg\ download instructions, hardware requirements, workflow)~\cite{paperswithcode, kang2023papers, hong2013software}.
 
 One difficult aspect of creating a truly reproducible artifact is to properly control the software environment: packages and libraries versions.
-Several works already shed light on the possible variability of experimental results given a badly captured software environment~\cite{mytkowicz_producing_nodate, sokolowski2024impact}.
+Several works already shed light on the possible variability of results given a badly captured software environment~\cite{mytkowicz_producing_nodate, sokolowski2024impact}.
 To address this issue, the conference \adae\ committees have advised authors to provide containers or virtual machines to share their artifacts in order to ``freeze'' their software environment~\cite{eurosys25, aetips, csartifacts}.
 In practice, about 12\% of the artifacts use such tools~\cite{guilloteau2024longevity}.
 %However, authors generate their artifact right before the artifact submission~\cite{guilloteau2024longevity, guilloteau2024frustrations}.
@@ -263,7 +263,7 @@ One would be for the authors to store and then provide the built container itsel
 But this comes with the downside of requiring more storage space than just storing the recipe (binary vs. text file), and thus has some \textbf{severe scalability and sustainability issues in terms of longevity}~\cite{monroe2023preservation, guilloteau2024longevity}.
 Moreover, storing the built binary image exhibits limitations when needed to \emph{inspect} the actual content of the image, and when a modification of the software environment capture by this image is needed~\cite{mercier2018considering}.
 Having the opportunity to extend previous scientific work is a crucial aspect in any scientific field.
-To the best of our knowledge, no previous work has exhibited the variations in software environment build from \df s through time.
+
 
 %\todo{this is already some kind of conlusion...}
 %A better solution would be to use tools such as Nix~\cite{dolstra_nix_2004} or Guix~\cite{courtes_functional_2013} which are focused on reproducibility and which are able to rebuild the \emph{exact same} software environment from a textual description and with longevity properties~\cite{courtes2024source}, but these tools are unfortunately poorly adopted by the community~\cite{guilloteau2024longevity}.
@@ -302,51 +302,14 @@ Finally, we conclude and give perspectives in Section~\ref{sec:conclusion}.
 In this section, we present \ecg, \fmc{Can we explain the acronym?} a tool for building \df s from research artifacts and collecting information on their resulting software environment.
 \ecg\ is a 280-line Python3 script~\cite{ecg} under the GPLv3 license.
 
-\subsection{Information captured by \ecg}\label{sec:ecg:capture}
-
-This section presents the different information collected by \ecg.%, and their motivations.
-
-\subsubsection{Cryptographic Hash of the Artifact}
-
-The authors can share artifacts in several ways, but not all ways have the same guarantees in terms of longevity and ``stability'' of the link.
-Hence, \ecg\ captures the result of the download at the given link (success or error).
-In case of a successful download, \ecg\ computes the cryptographic hash of the download result to capture any variation in the source of the artifact which could later explain variations in the resulting software environment.
-
-For example, authors can link to a Zenodo archive that will \emph{always} point to the latest artifact version.
-Hence, the content of the artifact behind this link can change over time.
-
-\subsubsection{Docker Building Error}
-
-In the case of \df\ failing to build, \ecg\ captures the error returned by the building process (\eg\ missing image, failing command).
-In fact, \ecg\ is only capable of capturing the \emph{first error} of the build even if there might be several errors in the building process.
-The Docker error is extracted by \texttt{grep}ing the building process log.
-
-\subsubsection{List of Installed Packages and their Version}
-
-The software environment can be composed of several packages, which can have been installed by different means.
-The most common way is through package managers (\eg\ \texttt{apt}, \texttt{dpkg}, \texttt{yum}).
-But there are also packages installed for programming languages such as with \texttt{pip} for Python.
-Another way to install the package is to download the sources and build them locally.
-\ecg\ is able to capture these different ways to install packages.
-Hence, for each package, \ecg\ extracts the package name, the version, and the tool used to install the package.
-
-Currently, \ecg\ is capable of querying information from popular package managers (\texttt{dkpg} (and thus \texttt{apt}), \texttt{pacman}, \texttt{pip}, \texttt{conda}) and to deal with situations where packages are installed by source (\texttt{package\_managers} in Listing~\ref{lst:nickel}), or the case of packages installed in virtual Python environments.
-In the case where there is a \texttt{git clone} command in the \df\ (\texttt{git\_packages} in Listing~\ref{lst:nickel}), \ecg\ will extract the commit of the local clone of the repository after the successful build of the container, and use this commit as a ``version''.
-In the case of a download of the sources of a package (\texttt{misc\_packages} in Listing~\ref{lst:nickel}), for example with \texttt{wget} or \texttt{curl}, there is no immediate way to log the version of the package that is being downloaded.
-The URL of the source code might contain a version number, but this URL might in the future point to a different version of the source code.
-Hence, \ecg\ will download \emph{locally} (outside the container) the source code pointed by the URL and compute the cryptographic hash of the result to generate a ``version''.
-
 \subsection{Artifact representation}\label{sec:nickel}
 
-The information captured by \ecg\ cannot be automatically extracted from a \df.
-In some cases, authors of artifact can have shell scripts installing packages (\eg\ calling \texttt{apt install}), which would be invisible at the \df\ level.
-With \ecg, a \df\ from an artifact is represented as a Nickel configuration file~\cite{nickel}, which is similar to JSON or YAML.
-%Nickel is a configuration language with a functional paradigm.
+With \ecg, a \df\ from an artifact is represented as a Nickel configuration file~\cite{nickel}.
+Nickel is a configuration language with a functional paradigm.
 One of Nickel's features is the possibility to \emph{verify} that a configuration file is valid with respect to a \emph{contract}.
 The Nickel file representing the artifact is then \emph{verified} against the contract~\cite{ecg_contract} and translated to a JSON file given as input to \ecg.
 Listing~\ref{lst:nickel} shows an example of a Nickel representation.
 The contract is versioned (line 2 of Listing~\ref{lst:nickel}) to take into account potential future changes to the descriptions and the contract.
-If the Nickel file does not respect the contract, an error is reported to the user.
 
 \begin{lstlisting}[caption=Example of Artifact representation in Nickel, label=lst:nickel]
 {
@@ -371,6 +334,40 @@ If the Nickel file does not respect the contract, an error is reported to the us
 \end{lstlisting}
 
 
+\subsection{Information captured by \ecg}\label{sec:ecg:capture}
+
+This section presents the different information collected by \ecg.%, and their motivations.
+
+\subsubsection{Cryptographic Hash of the Artifact}
+
+The authors can share artifacts in several ways, but not all ways have the same guarantees in terms of longevity and ``stability'' of the link.
+Hence, \ecg\ captures the result of the download at the given link (success or error).
+In case of a successful download, \ecg\ computes the cryptographic hash of the download result to capture any variation in the source of the artifact which could later explain variations in the resulting software environment.
+
+For example, authors can link to a Zenodo archive that will \emph{always} point to the latest artifact version.% of an artifact.
+Hence, the content of the artifact behind this link can change over time.
+
+\subsubsection{Docker Building Error}
+
+In the case of \df\ failing to build, \ecg\ captures the error returned by the building process (\eg\ missing image, failing command).
+In fact, \ecg\ is only capable of capturing the \emph{first error} of the build even if there might be several errors in the building process.
+The Docker error is extracted by \texttt{grep}ing the building process log.
+
+\subsubsection{List of Installed Packages and their Version}
+
+The software environment can be composed of several packages, which can have been installed by different means.
+The most common way is through package managers (\eg\ \texttt{apt}, \texttt{dpkg}, \texttt{yum}).
+But there are also packages installed for programming languages such as with \texttt{pip} for Python.
+Another way to install the package is to download the sources and build them locally.
+\ecg\ is able to capture these different ways to install packages.
+Hence, for each package, \ecg\ extracts the package name, the version, and the tool used to install the package.
+
+Currently, \ecg\ is capable of querying information from popular package managers (\texttt{dkpg} (and thus \texttt{apt}), \texttt{pacman}, \texttt{pip}, \texttt{conda}) and to deal with situations where packages are installed by source (\texttt{package\_managers} in Listing~\ref{lst:nickel}), or the case of packages installed in virtual Python environments.
+In the case where there is a \texttt{git clone} command in the \df\ (\texttt{git\_packages} in Listing~\ref{lst:nickel}), \ecg\ will extract the commit of the local clone of the repository after the successful build of the container, and use this commit as a ``version''.
+In the case of a download of the sources of a package (\texttt{misc\_packages} in Listing~\ref{lst:nickel}), for example with \texttt{wget} or \texttt{curl}, there is no immediate way to log the version of the package that is being downloaded.
+The URL of the source code might contain a version number, but this URL might in the future point to a different version of the source code.
+Hence, \ecg\ will download \emph{locally} (outside the container) the source code pointed by the URL and compute the cryptographic hash of the result to generate a ``version''.
+
 
 \subsection{Workflow}\label{sec:workflow}
 
@@ -391,8 +388,7 @@ If the Nickel file does not respect the contract, an error is reported to the us
 \end{figure*}
 
 The workflow of \ecg\ is shown in Figure~\ref{fig:workflow}.
-The workflow itself~\cite{ecg_workflow} is governed by the Snakemake workflow manager~\cite{koster2012snakemake}, and its software environment~\cite{ecg_nix} is managed by the Nix functional package manager~\cite{dolstra_nix_2004}.
-These tools provide reproducibility and robustness to the workflow setup to ensure that we will be able to execute the exact same workflow in the exact same conditions for all the future builds of the artifacts.
+The workflow itself~\cite{ecg_workflow} is governed by a Snakemake~\cite{koster2012snakemake} description, and its software environment~\cite{ecg_nix} is managed with Nix~\cite{dolstra_nix_2004}.
 
 % \subsection{Contributions}
 % 
@@ -407,19 +403,20 @@ This section presents the initial protocol of our longitudinal study.
 
 \begin{enumerate}
 \item For each conference with an artifact evaluation process, we examine all artifacts and consider only those that share their software environment using a \df.
-\item From the artifact and the \df\ we generate the associated Nickel file (Listing~\ref{lst:nickel}) which contains information such as the artifact's location, how to extract the \df\ from the artifact and the package managers used. 
+\item From the artifact and the \df we generate the associated Nickel file (Listing~\ref{lst:nickel}) which contains information such as the artifact's location, how to extract the \df\ from the artifact and the package managers used. 
 %where is the artifact stored? how to extract the \df\ out from the artifact? which package managers are used?
 \item Once all Nickel descriptions for the artifacts of a conference have been completed, we use \ecg\ to construct the download, build, and extract information from each of them.
 \item Prior to building each container, the local Docker cache is cleared on these machines.
 \item We will execute \ecg\ on each artifact every month, as close to the beginning of the month as possible, for a full year (\ie\ 13 months).
 \end{enumerate}
 
+\newpage
+
 \paragraph{Details}
 \begin{itemize}
 \item We ensure that an empty local Docker cache is used before building the containers.
 \item Each container is allocated a 10-minute time frame to build.
 \item \ecg\ is executed on the x86-64 machines of the \grid\ platform~\cite{grid5000} on the \texttt{dahu} cluster of the Grenoble site.
-\item We do not try to reproduce the experiment results from the artifacts, but only to build the container. The impact of software environment varations on the experiments results has been studied for example in \cite{mytkowicz_producing_nodate, sokolowski2024impact}.
 \end{itemize}
 
 \section{Preliminary Results}\label{sec:results}
@@ -576,7 +573,7 @@ The question of the results' significance on such a small sample will need to be
   The lack of reproducibility of \df s should not be hidden behind long-term storage: the practices of the authors and of \adae\ need to be re-evaluated.
 }
 
-The community may want to adopt instead solutions \emph{tailored for long-term reproducibility} of software environment~\cite{malka2024reproducibility} (\ie\ Nix~\cite{dolstra_nix_2004} and Guix~\cite{courtes_functional_2013}), where authors can share a textual representation of their software environment which could be precisely reproduced and with longevity guarantees~\cite{courtes2024source}.
+The community may want to adopt solutions \emph{tailored for reproducibility} of software environment (\ie\ Nix~\cite{dolstra_nix_2004} and Guix~\cite{courtes_functional_2013}), where authors can share a textual representation of their software environment which could be precisely reproduced and with longevity guarantees~\cite{courtes2024source}.
 Moreover, Nix and Guix allow the precise introduction of variation in the software environment, which is a crucial feature (not present in container technologies) in order to build upon previous artifact for future publications~\cite{mercier2018considering}.
 
 \paragraph{Future Perspectives}
@@ -591,7 +588,6 @@ Therefore, we will write descriptions of more artifacts from more conferences, a
 %
 % /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-\newpage
 \section*{Acknowledgments}
 
 %Antoine?
@@ -602,8 +598,8 @@ This research was funded in part by the European Union’s Horizon 2020 research
 
 %% PAPER ENDS HERE -----------------------------------------------------------------------------------------------
 
-% \newpage
-% \newpage
+\newpage
+\newpage
 %\bibliographystyle{sty/ACM-Reference-Format}
 %\bibliography{references}
 \printbibliography

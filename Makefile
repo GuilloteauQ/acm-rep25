@@ -1,4 +1,4 @@
-all: src/main.pdf
+all: src/main.pdf src/rebuttal.pdf src/diff.pdf src/for_reviewers.pdf
 
 ZENODO_URL:=https://zenodo.org/records/15132467/files/europar24.zip
 
@@ -50,3 +50,14 @@ data/aggregated/build_status.csv: $(DATA_BUILD_STATUS)
 data/aggregated/artifact_hash.csv: $(DATA_ARTIFACT_HASH)
 	mkdir -p data/aggregated && cat $^ > $@
 
+src/diff.tex: src/first_submission.tex src/main.tex
+	latexdiff $^ > $@
+
+src/diff.pdf: src/diff.tex
+	cd src; rubber -d diff
+
+src/rebuttal.pdf: src/rebuttal.tex
+	cd src; rubber -d rebuttal
+
+src/for_reviewers.pdf: src/for_reviewers.tex src/rebuttal.pdf src/diff.pdf src/main.pdf
+	cd src/; rubber -f -d for_reviewers
