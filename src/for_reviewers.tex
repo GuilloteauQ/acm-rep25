@@ -1,6 +1,11 @@
 \documentclass{article}
 \usepackage{pdfpages}
 \usepackage{graphicx}
+\usepackage[
+	a4paper,
+	margin=20mm,  % tighter margins
+]{geometry}
+\pagenumbering{gobble}
 % \begin{document}
 \title{%
   SHORT: Longitudinal Study of Software Environments Produced by Dockerfiles from Research Artifacts: Initial Design
@@ -18,23 +23,74 @@
 \maketitle
 
 
+% \begin{abstract}
+% This document is composed of three parts:
+% 
+% \begin{enumerate}
+% \item a 1-page answer addressing comments from the reviewers
+% \item the new submission of the article
+% \item the detailed answers to the reviewers comments
+% \item a ``diff'' between the initial submission and the new submission (additions in underlined blue, deletions in crossed-out red)
+% \end{enumerate}
+% \end{abstract}
 
-\begin{abstract}
-This document is composed of three parts:
+% \tableofcontents
 
-\begin{enumerate}
-\item the detailed answers to the reviewers comments
-\item a ``diff'' between the initial submission and the new submission (additions in underlined blue, deletions in crossed-out red)
-\item the new submission of the article
-\end{enumerate}
-\end{abstract}
+First and foremost, we would like to thank the reviewers for their insightful comments.
+In this 1-page document, we address their recurrent interrogations.
+Following this 1-page document, we attached the revised version of the article.
+For completeness, we also attached detailed and individual answers to the reviewers' comments, as well as a clear visual representation of the changes between the initial submission and the revised version of the article (additions are underlined in blue, and deletions in crossed-out red).
 
-\tableofcontents
+\paragraph{Usage of Nickel}
 
-\section{Answers to reviewers}
-\includepdf[pages=-]{rebuttal.pdf}
-\section{Changes made}
-\includepdf[pages=-]{diff.pdf}
-\section{New version}
+Nickel is a configuration language (like JSON or YAML), but with the possibility to define constraints on the configurations' structures and values, named ``contract''s.
+
+We cannot simply use/parse Dockerfiles to extract the same information.
+Indeed, the authors crafting their Dockerfile could, for example, do the installation of their software dependencies in a shell script that will then be called in the steps of the Dockerfile.
+The content of this script is unknown at the Dockerfile level.
+Hence, the need to capture manually the download and installations and list them in this textual Nickel format.
+
+
+If the Nickel contract is not respected, then the Nickel representation of the artifact's Dockerfile (Listing 1) does not respect the ``model'' (in the UML sense) / structure and content expected by \texttt{ecg} (the script performing the downloading, the building and the information extracting of the Docker image from the research artifact).
+Transformation from the Nickel representation to the JSON representation (given as input to \texttt{ecg}) (see Figure 1) will return an error and the workflow will not try to rebuild this Docker image.
+In short, the contract allows us to verify the correctness of the artifact description (Listing 1) before attempting to execute \texttt{ecg}.
+
+
+This Nickel representation is therefore not an attempt at replacing Dockerfile, but is instead of extracted view of what the Dockerfile will download and install, such that the information about what has actually been downloaded and installed can be extracted by \texttt{ecg}.
+This representation is in no way a proposition for a new tool/format to build container images.
+
+
+$\hookrightarrow$ \textbf{To improve clarity, we swapped the order of Sections 2.1 and 2.2, and explained more about the use of the Nickel representation.}
+
+\paragraph{Impact of software environment on experiments results}
+
+The question of the impact of variation software environment on the experiments results has been studied in the literature (see, for example, the citations [28, 32] ([27, 31] in the initial submission) cited in the second paragraph of the introduction and is not addressed in this paper.
+In this work, we thus do not try to reproduce the experiments associated to the Dockerfile that we are building.
+
+$\hookrightarrow$ \textbf{In Section 3 we added a sentence to make this point more explicit.}
+
+
+\paragraph{Limited evaluation}
+
+We fully acknowledge that a wider evaluation is required to target a full publication.
+As stated in the conclusion section (Section 5), this short paper aims to be an initial version of a larger-scale study.
+The scope of our current submission is a short paper that describes a \emph{proof of concept} that experiments can be built over time.
+The purpose of this short paper is to investigate the necessity and potential of a larger-scale study.
+This wider evaluation will need to consider several container technologies, from various conferences with varying levels of computer science technical expertise.
+
+While the drifting of the software environment produced by Dockerfile has been a common claim of the literature, we are unaware of any proof or evidence supporting it and characterizing it. %have yet to see any proof of it.
+Our work therefore aims to bring evidence supporting the claim that the reproducibility of Software Environments decays over time.
+
+$\hookrightarrow$ \textbf{We added a sentence at the end of the introduction to make this gap explicit in the literature.}
+
+
+
+
+\newpage
+% \section{New version}
 \includepdf[pages=-]{main.pdf}
+% \section{Answers to reviewers}
+\includepdf[pages=-]{rebuttal.pdf}
+% \section{Changes made}
+\includepdf[pages=-]{diff.pdf}
 \end{document}
